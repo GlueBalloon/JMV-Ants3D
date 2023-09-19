@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Author</key>
+	<string>Unknown</string>
+	<key>Buffer Order</key>
+	<array>
+		<string>Main</string>
+		<string>Ants</string>
+		<string>World</string>
+		<string>Buttons</string>
+		<string>Main2</string>
+		<string>Bcjytcngfxngf</string>
+		<string>Runaround</string>
+		<string>FunctionList</string>
+		<string>3DWorld</string>
+		<string>Ants3D</string>
+		<string>Ant3D_Singular</string>
+		<string>AntAndButtonSingular</string>
+		<string>SmallBallsDemo</string>
+		<string>SphereCollisionDemo</string>
+		<string>BoundsDemo</string>
+		<string>SpherePlacementDemo</string>
+		<string>Utilities</string>
+		<string>Main3</string>
+	</array>
+	<key>Created</key>
+	<string>2013-04-03 03:22:18 +0000</string>
+	<key>Dependencies</key>
+	<array>
+		<string>Craft:Cameras</string>
+	</array>
+	<key>Description</key>
+	<string>No description available</string>
+</dict>
+</plist>
