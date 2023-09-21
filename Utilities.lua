@@ -8,3 +8,15 @@ function randomPlus(min, max)
         return min + offset
     end
 end
+
+-- Function to rotate a vector by a quaternion
+function rotateVectorByQuat(vec, quat)
+    local qvec = vec3(quat.x, quat.y, quat.z)
+    local uv = qvec:cross(vec)
+    local uuv = qvec:cross(uv)
+    uv = uv * (2.0 * quat.w)
+    uuv = uuv * 2.0
+    return vec + uv + uuv
+end
+
+

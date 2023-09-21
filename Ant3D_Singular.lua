@@ -41,9 +41,9 @@ function Ant3D:init(caller, antColor)
     self.caller = caller
     self.color = antColor
 
-    self.changeDirPeriod = 0.5 
-    self.speedRatioToGlobe = 0.00015
-    
+    self.changeDirPeriod = 6.0 --0.5
+    self.speedRatioToGlobe = 0.00065 --0.00015
+
     self.body = self:createBodyEntity(self.color)
     local body = self.body
     body.info = self
@@ -83,5 +83,6 @@ function Ant3D:createBodyEntity(antColor)
     antRB = antEntity:add(craft.rigidbody, DYNAMIC, 0)
     antRB.group = GROUP_ANT
     antRB.mask = MASK_ANT
+    antEntity.rigidbody = antRB
     return antEntity
 end

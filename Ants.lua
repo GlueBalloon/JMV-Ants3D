@@ -185,8 +185,6 @@ function Ants:antsUpdate()
         self.doPheroDecrease = false
         self.pheroDecreaseT0 = ElapsedTime + 1
     end
-
-
 end
 
 function Ants:makeDecision(ant)
