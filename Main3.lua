@@ -43,6 +43,7 @@ function draw()
     ants3DTables[2]:antsUpdate()
     
     -- If moving, compute the new position along the arc
+    --[[
     if smallSphere.moving then
         smallSphere.position = travelAlongArc(startPoint, endPoint, globe3D.scale.x, smallSphere.arcProgress)
         smallSphere.arcProgress = smallSphere.arcProgress + smallSphere.step
@@ -52,15 +53,17 @@ function draw()
             smallSphere.moving = false  -- Stop moving
         end
     end
+    ]]
+    travelIfGivenDestination(smallSphere, globe3D)
 end
 
 function touched(touch)
     if touch.state == BEGAN then
         if smallSphere then
             -- Set the start and end points for the movement
-            startPoint = smallSphere.position
+            smallSphere.startPoint = smallSphere.position
             local rad = globe3D.scale.x
-            endPoint = vec3(randomPlus(-rad, rad), randomPlus(-rad, rad), randomPlus(-rad, rad)) -- Random end point for demonstration
+            smallSphere.endPoint = vec3(randomPlus(-rad, rad), randomPlus(-rad, rad), randomPlus(-rad, rad)) -- Random end point for demonstration
             
             -- Reset arcProgress and set moving to true
             smallSphere.arcProgress = 0
@@ -94,14 +97,22 @@ function orientToSurface(antEntity, globe)
     antEntity.rotation = newRotation
 end
 
-function travelToGivenDestination(entity)
+function travelIfGivenDestination(entity, globe)
     -- Check if the entity has the necessary properties
-    if not (entity.startPoint and entity.endPoint and entity.arcProgress and entity.radius) then
+    if not (entity.startPoint and entity.endPoint and entity.arcProgress) then
         return
     end
     
+    -- Check if the entity is supposed to be moving
+    if not entity.moving then
+        return
+    end
+    
+    -- Fetch the radius from the globe
+    local radius = globe.scale.x
+    
     -- Compute the new position along the arc
-    entity.position = travelAlongArc(entity.startPoint, entity.endPoint, entity.radius, entity.arcProgress)
+    entity.position = travelAlongArc(entity.startPoint, entity.endPoint, radius, entity.arcProgress)
     
     -- Update the progress along the arc
     entity.arcProgress = entity.arcProgress + entity.step
@@ -109,10 +120,10 @@ function travelToGivenDestination(entity)
     -- Reset the progress if it reaches or exceeds 1
     if entity.arcProgress >= 1 then
         entity.arcProgress = 0
+        entity.moving = false  -- Stop moving when reaching the destination
         -- Optionally, set a new destination here
     end
 end
-
 
 function travelAlongArc(startPoint, endPoint, radius, t)
     -- Normalize the points to the sphere's surface
