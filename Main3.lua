@@ -43,23 +43,13 @@ function draw()
     ants3DTables[2]:antsUpdate()
     
     -- If moving, compute the new position along the arc
-    if moving then
-        smallSphere.position = travelAlongArc(startPoint, endPoint, 5, arcProgress)
-        arcProgress = arcProgress + step
-        
-        if arcProgress >= 1 then
-            
-            arcProgress = 0
-        end
-    end
-    -- If moving, compute the new position along the arc
-    if moving then
+    if smallSphere.moving then
         smallSphere.position = travelAlongArc(startPoint, endPoint, globe3D.scale.x, smallSphere.arcProgress)
-        smallSphere.arcProgress = smallSphere.arcProgress + step
+        smallSphere.arcProgress = smallSphere.arcProgress + smallSphere.step
         
         if smallSphere.arcProgress >= 1 then
             smallSphere.arcProgress = 0
-            moving = false  -- Stop moving
+            smallSphere.moving = false  -- Stop moving
         end
     end
 end
@@ -74,7 +64,7 @@ function touched(touch)
             
             -- Reset arcProgress and set moving to true
             smallSphere.arcProgress = 0
-            moving = true
+            smallSphere.moving = true
         end
     end
     touches.touched(touch)
@@ -103,6 +93,26 @@ function orientToSurface(antEntity, globe)
     
     antEntity.rotation = newRotation
 end
+
+function travelToGivenDestination(entity)
+    -- Check if the entity has the necessary properties
+    if not (entity.startPoint and entity.endPoint and entity.arcProgress and entity.radius) then
+        return
+    end
+    
+    -- Compute the new position along the arc
+    entity.position = travelAlongArc(entity.startPoint, entity.endPoint, entity.radius, entity.arcProgress)
+    
+    -- Update the progress along the arc
+    entity.arcProgress = entity.arcProgress + entity.step
+    
+    -- Reset the progress if it reaches or exceeds 1
+    if entity.arcProgress >= 1 then
+        entity.arcProgress = 0
+        -- Optionally, set a new destination here
+    end
+end
+
 
 function travelAlongArc(startPoint, endPoint, radius, t)
     -- Normalize the points to the sphere's surface

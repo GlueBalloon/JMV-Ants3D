@@ -17,7 +17,6 @@ MASK_HOME_BASE = ~(GROUP_HOME_BASE) -- Home bases should not collide with themse
 function createEnvironment(globeRadius)
     local globe3D = createWorld(globeRadius)
     initializeViewer(globe3D)
-    initializeSmallSphereMotionVariables(globe3D)
     foodSources = makeFoodSources(globe3D)
     obstacles = makeObstacles(globe3D)
     return globe3D
@@ -31,6 +30,11 @@ function makeSmallTestSphere(globe)
     smallSphere.position = vec3(0, 0, -globe.scale.z)
     smallSphere.arcProgress = 0
     startPoint = smallSphere.position
+    smallSphere.moving = false
+    smallSphere.arcProgress = 0
+    smallSphere.step = 0.01
+    smallSphere.startPoint = vec3(0, 0, globe.scale.z)
+    smallSphere.endPoint = vec3(0, globe.scale.y, 0)
 end
 
 function initializeViewer(globe)
@@ -71,15 +75,6 @@ function createWorld(radius)
     fillLightComponent.color = color(55, 150, 196)
     
     return globe
-end
-
-function initializeSmallSphereMotionVariables(globe)
-    -- Variables to control the movement
-    moving = false
-    arcProgress = 0
-    step = 0.01
-    startPoint = vec3(0, 0, globe.scale.z)
-    endPoint = vec3(0, globe.scale.y, 0) -- Default end point, can be changed
 end
 
 function makeFoodSources(globe)
