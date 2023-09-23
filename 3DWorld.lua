@@ -24,17 +24,16 @@ end
 
 function makeSmallTestSphere(globe)
     smallSphere = scene:entity()
+    smallSphere.d = {} --catch-all data table
     smallSphere.model = craft.model.icosphere(0.2) -- 0.2 is the radius, adjust as needed
     smallSphere.material = craft.material("Materials:Specular")
     smallSphere.material.map = readImage(asset.builtin.Blocks.Cotton_Red) -- You can replace this with any texture
     smallSphere.position = vec3(0, 0, -globe.scale.z)
-    smallSphere.arcProgress = 0
-    startPoint = smallSphere.position
-    smallSphere.moving = false
-    smallSphere.arcProgress = 0
-    smallSphere.arcStep = 0.01
-    smallSphere.startPoint = vec3(0, 0, globe.scale.z)
-    smallSphere.endPoint = vec3(0, globe.scale.y, 0)
+    smallSphere.d.moving = false
+    smallSphere.d.arcProgress = 0
+    smallSphere.d.arcStep = 0.01
+    smallSphere.d.startPoint = vec3(0, 0, globe.scale.z)
+    smallSphere.d.endPoint = vec3(0, globe.scale.y, 0)
 end
 
 function initializeViewer(globe)
@@ -92,6 +91,7 @@ function makeFoodSources(globe)
     
     for i = 1, numFoodSources do
         local food = scene:entity()
+        food.d = {} --catch-all data table
         food.model = craft.model(asset.builtin.Primitives.Sphere)
         food.material = craft.material(asset.builtin.Materials.Standard)
         food.material.map = readImage(asset.builtin.Blocks.Stone_Browniron_Alt) -- You can replace this with any texture
@@ -127,7 +127,7 @@ function makeFoodSources(globe)
         foodRB.mask = MASK_FOOD
         foodRB.mass = 100
         food:add(craft.shape.sphere, foodRadius) -- collision shape
-        food.info = {["typ"]=OBJ_FOOD, ["r"]=foodRadius, body=foodRB}
+        food.d.info = {["typ"]=OBJ_FOOD, ["r"]=foodRadius, body=foodRB}
 
         table.insert(foodSources, food)
     end
@@ -148,6 +148,7 @@ function makeObstacles(globe)
     
     for i = 1, numObstacles do
         local obstacle = scene:entity()
+        obstacle.d = {} --catch-all data table
         local obstacleHeight = globeRadius * (math.random(30, 90
         ) * 0.001) -- height of the capsule
         local obstacleRadius = globeRadius * (math.random(180, 310) * 0.001) -- size relative to the globe
@@ -186,7 +187,7 @@ function makeObstacles(globe)
         obstacleRB.group = GROUP_OBSTACLE
         obstacleRB.mask = MASK_OBSTACLE
         obstacle:add(craft.shape.capsule, obstacleRadius, obstacleHeight) -- collision shape
-        obstacle.info = {["typ"]=OBJ_OBSTACLE, ["r"]=obstacleRadius, body=obstacleRB}
+        obstacle.d.info = {["typ"]=OBJ_OBSTACLE, ["r"]=obstacleRadius, body=obstacleRB}
         --local obstacleColor = color(70, 52, 30, 255)
         --obstacle.material.diffuse = obstacleColor
         table.insert(obstacles, obstacle)

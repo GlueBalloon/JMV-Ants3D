@@ -49,13 +49,13 @@ function touched(touch)
     if touch.state == BEGAN then
         if smallSphere then
             -- Set the start and end points for the movement
-            smallSphere.startPoint = smallSphere.position
+            smallSphere.d.startPoint = smallSphere.position
             local rad = globe3D.scale.x
-            smallSphere.endPoint = vec3(randomPlus(-rad, rad), randomPlus(-rad, rad), randomPlus(-rad, rad)) -- Random end point for demonstration
+            smallSphere.d.endPoint = vec3(randomPlus(-rad, rad), randomPlus(-rad, rad), randomPlus(-rad, rad)) -- Random end point for demonstration
             
             -- Reset arcProgress and set moving to true
-            smallSphere.arcProgress = 0
-            smallSphere.moving = true
+            smallSphered.arcProgress = 0
+            smallSphere.d.moving = true
         end
     end
     touches.touched(touch)
@@ -87,12 +87,12 @@ end
 
 function travelIfGivenDestination(entity, globe)
     -- Check if the entity has the necessary properties
-    if not (entity.startPoint and entity.endPoint and entity.arcProgress) then
+    if not (entity.d.startPoint and entity.d.endPoint and entity.d.arcProgress) then
         return
     end
     
     -- Check if the entity is supposed to be moving
-    if not entity.moving then
+    if not entity.d.moving then
         return
     end
     
@@ -100,15 +100,15 @@ function travelIfGivenDestination(entity, globe)
     local radius = globe.scale.x
     
     -- Compute the new position along the arc
-    entity.position = travelAlongArc(entity.startPoint, entity.endPoint, radius, entity.arcProgress)
+    entity.position = travelAlongArc(entity.d.startPoint, entity.d.endPoint, radius, entity.d.arcProgress)
     
     -- Update the progress along the arc
-    entity.arcProgress = entity.arcProgress + entity.arcStep
+    entity.d.arcProgress = entity.d.arcProgress + entity.d.arcStep
     
     -- Reset the progress if it reaches or exceeds 1
-    if entity.arcProgress >= 1 then
-        entity.arcProgress = 0
-        entity.moving = false  -- Stop moving when reaching the destination
+    if entity.d.arcProgress >= 1 then
+        entity.d.arcProgress = 0
+        entity.d.moving = false  -- Stop moving when reaching the destination
         -- Optionally, set a new destination here
     end
 end

@@ -207,6 +207,7 @@ function Ants3D:homeBaseInit()
     
     -- Create the squashed sphere for the home base
     self.base = scene:entity()
+    self.base.d = {} --catch-all data table
     self.base.model = craft.model(asset.builtin.Primitives.Sphere)
     self.base.material = craft.material(asset.builtin.Materials.Standard)
     self.base.material.map = readImage(asset.builtin.Blocks.Glass_Frame) -- You can replace this with any texture
@@ -263,7 +264,7 @@ function Ants3D:homeBaseInit()
         -- Adjust the position to sink the sphere into the globe
         local sinkAmount = self.base.scale.y * 0.6-- Adjust as needed
         self.base.position = self.base.position - upVector * sinkAmount
-        self.base.info = {["typ"]=HOME,["family"]= self.family }
+        self.base.d.info = {["typ"]=HOME,["family"]= self.family }
     end
 end
 

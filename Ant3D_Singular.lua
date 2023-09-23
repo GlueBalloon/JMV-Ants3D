@@ -45,13 +45,14 @@ function Ant3D:init(caller, antColor)
     self.speedRatioToGlobe = 0.00065 --0.00015
 
     self.body = self:createBodyEntity(self.color)
+    self.body.d = {} --catch-all data table
     local body = self.body
     body.info = self
     body.type = DYNAMIC
     
     self.action = ANT_ACTION_RUN
     
-    self.arcProgress = 0
+    self.body.d.arcProgress = 0
     
     -- ant brain data
     self.typ = ANT
