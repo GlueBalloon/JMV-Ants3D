@@ -42,18 +42,6 @@ function draw()
     ants3DTables[1]:antsUpdate()
     ants3DTables[2]:antsUpdate()
     
-    -- If moving, compute the new position along the arc
-    --[[
-    if smallSphere.moving then
-        smallSphere.position = travelAlongArc(startPoint, endPoint, globe3D.scale.x, smallSphere.arcProgress)
-        smallSphere.arcProgress = smallSphere.arcProgress + smallSphere.step
-        
-        if smallSphere.arcProgress >= 1 then
-            smallSphere.arcProgress = 0
-            smallSphere.moving = false  -- Stop moving
-        end
-    end
-    ]]
     travelIfGivenDestination(smallSphere, globe3D)
 end
 
@@ -115,7 +103,7 @@ function travelIfGivenDestination(entity, globe)
     entity.position = travelAlongArc(entity.startPoint, entity.endPoint, radius, entity.arcProgress)
     
     -- Update the progress along the arc
-    entity.arcProgress = entity.arcProgress + entity.step
+    entity.arcProgress = entity.arcProgress + entity.arcStep
     
     -- Reset the progress if it reaches or exceeds 1
     if entity.arcProgress >= 1 then

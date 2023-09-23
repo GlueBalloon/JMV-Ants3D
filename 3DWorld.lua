@@ -32,7 +32,7 @@ function makeSmallTestSphere(globe)
     startPoint = smallSphere.position
     smallSphere.moving = false
     smallSphere.arcProgress = 0
-    smallSphere.step = 0.01
+    smallSphere.arcStep = 0.01
     smallSphere.startPoint = vec3(0, 0, globe.scale.z)
     smallSphere.endPoint = vec3(0, globe.scale.y, 0)
 end
