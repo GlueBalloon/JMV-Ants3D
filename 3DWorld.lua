@@ -14,8 +14,8 @@ MASK_OBSTACLE = ~(GROUP_OBSTACLE) -- Obstacles should not collide with themselve
 MASK_HOME_BASE = ~(GROUP_HOME_BASE) -- Home bases should not collide with themselves
 
 
-function createEnvironment()
-    local globe3D = createWorld()
+function createEnvironment(globeRadius)
+    local globe3D = createWorld(globeRadius)
     initializeViewer(globe3D)
     initializeSmallSphereMotionVariables(globe3D)
     foodSources = makeFoodSources(globe3D)
@@ -29,6 +29,7 @@ function makeSmallTestSphere(globe)
     smallSphere.material = craft.material("Materials:Specular")
     smallSphere.material.map = readImage(asset.builtin.Blocks.Cotton_Red) -- You can replace this with any texture
     smallSphere.position = vec3(0, 0, -globe.scale.z)
+    smallSphere.arcProgress = 0
     startPoint = smallSphere.position
 end
 
@@ -37,7 +38,7 @@ function initializeViewer(globe)
     viewer = scene.camera:add(OrbitViewer, globe.position, 23, 6, 800)
 end
 
-function createWorld()
+function createWorld(radius)
     --[[
     parameter.integer("fillX",-180,180,45)
     parameter.integer("fillY",-180,180,45)
@@ -53,7 +54,7 @@ function createWorld()
     globe.material.map = readImage(asset.builtin.Blocks.Stone_Browniron_Alt) -- You can replace this with any texture
     globe.material.diffuse = color(0, 255, 117)
     globe.material.offsetRepeat = vec4(0,0,1.5,2.5)
-    globe.scale = vec3(1,1,1) * 7 -- Adjust the size of the globe
+    globe.scale = vec3(1,1,1) * radius -- Adjust the size of the globe
     globeRB = globe:add(craft.rigidbody, DYNAMIC, 0)
     globeRB.group = GROUP_GLOBE
     globeRB.mask = MASK_GLOBE

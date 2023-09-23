@@ -2,7 +2,7 @@
 currentAngle = 0
 
 function setup()
-    local globe3D = createEnvironment()
+    globe3D = createEnvironment(6)
     makeSmallTestSphere(globe3D)
     ants3DTables = createAntFamilies(globe3D)
     
@@ -36,48 +36,48 @@ function setup()
     end
 end
 
-function orientToSurface(antEntity, globe)
-    local globePosition = globe.position
-    local antPosition = antEntity.position
+function draw()
+    scene:update(DeltaTime)
+    scene:draw()
+    ants3DTables[1]:antsUpdate()
+    ants3DTables[2]:antsUpdate()
     
-    -- Calculate the orientation based on the direction vector
-    local upVector = (antPosition - globePosition):normalize()
-    local defaultUp = vec3(1, 0, 0):normalize()
-    upVector = upVector:normalize()
-
-    local dotProduct = defaultUp:dot(upVector)
-    local angle = math.acos(dotProduct)
-    
-    local rotationAxis = defaultUp:cross(upVector):normalize()
-    
-    antEntity.rotation = quat.angleAxis(math.deg(angle), rotationAxis)
+    -- If moving, compute the new position along the arc
+    if moving then
+        smallSphere.position = travelAlongArc(startPoint, endPoint, 5, arcProgress)
+        arcProgress = arcProgress + step
+        
+        if arcProgress >= 1 then
+            
+            arcProgress = 0
+        end
+    end
+    -- If moving, compute the new position along the arc
+    if moving then
+        smallSphere.position = travelAlongArc(startPoint, endPoint, globe3D.scale.x, smallSphere.arcProgress)
+        smallSphere.arcProgress = smallSphere.arcProgress + step
+        
+        if smallSphere.arcProgress >= 1 then
+            smallSphere.arcProgress = 0
+            moving = false  -- Stop moving
+        end
+    end
 end
-function orientToSurface(antEntity, globe)
-    local globePosition = globe.position
-    local antPosition = antEntity.position
-    
-    -- Calculate the orientation based on the direction vector
-    local upVector = (antPosition - globePosition):normalize()
-    local defaultUp = vec3(1, 0, 0):normalize()
-    upVector = upVector:normalize()
-    
-    local dotProduct = defaultUp:dot(upVector)
-    local angle = math.acos(dotProduct)
-    
-    local rotationAxis = defaultUp:cross(upVector):normalize()
-    
-    local surfaceAlignment = quat.angleAxis(math.deg(angle), rotationAxis)
-    
-    -- Get the ant's forward direction in world space
-    local forwardDirection = rotateVectorByQuat(vec3(1, 0, 0), antEntity.rotation)
-    
-    -- Calculate the rotation needed to face the direction of movement
-    local facingDirection = quat.lookRotation(forwardDirection, upVector)
-    
-    -- Combine the two rotations
-    local finalRotation = surfaceAlignment * facingDirection
-    
-    antEntity.rotation = finalRotation
+
+function touched(touch)
+    if touch.state == BEGAN then
+        if smallSphere then
+            -- Set the start and end points for the movement
+            startPoint = smallSphere.position
+            local rad = globe3D.scale.x
+            endPoint = vec3(randomPlus(-rad, rad), randomPlus(-rad, rad), randomPlus(-rad, rad)) -- Random end point for demonstration
+            
+            -- Reset arcProgress and set moving to true
+            smallSphere.arcProgress = 0
+            moving = true
+        end
+    end
+    touches.touched(touch)
 end
 
 function orientToSurface(antEntity, globe)
@@ -104,24 +104,6 @@ function orientToSurface(antEntity, globe)
     antEntity.rotation = newRotation
 end
 
-function draw()
-    scene:update(DeltaTime)
-    scene:draw()
-    ants3DTables[1]:antsUpdate()
-    ants3DTables[2]:antsUpdate()
-    
-    -- If moving, compute the new position along the arc
-    if moving then
-        smallSphere.position = travelAlongArc(startPoint, endPoint, 5, arcProgress)
-        arcProgress = arcProgress + step
-        
-        if arcProgress >= 1 then
-
-            arcProgress = 0
-        end
-    end
-end
-
 function travelAlongArc(startPoint, endPoint, radius, t)
     -- Normalize the points to the sphere's surface
     startPoint = startPoint:normalize() * radius
@@ -138,17 +120,4 @@ function travelAlongArc(startPoint, endPoint, radius, t)
     return position
 end
 
-function touched(touch)
-    if touch.state == BEGAN then
-        if smallSphere then
-            -- Set the start and end points for the movement
-            startPoint = smallSphere.position
-            endPoint = vec3(math.random(-5, 5), math.random(-5, 5), math.random(-5, 5)) -- Random end point for demonstration
-            
-            -- Reset arcProgress and set moving to true
-            arcProgress = 0
-            moving = true
-        end
-    end
-    touches.touched(touch)
-end
+
