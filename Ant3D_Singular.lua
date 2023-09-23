@@ -51,6 +51,8 @@ function Ant3D:init(caller, antColor)
     
     self.action = ANT_ACTION_RUN
     
+    self.arcProgress = 0
+    
     -- ant brain data
     self.typ = ANT
     self.familly = familly

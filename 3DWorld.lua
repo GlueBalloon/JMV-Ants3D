@@ -17,7 +17,7 @@ MASK_HOME_BASE = ~(GROUP_HOME_BASE) -- Home bases should not collide with themse
 function createEnvironment()
     local globe3D = createWorld()
     initializeViewer(globe3D)
-    initializeMotionVariables()
+    initializeSmallSphereMotionVariables(globe3D)
     foodSources = makeFoodSources(globe3D)
     obstacles = makeObstacles(globe3D)
     return globe3D
@@ -28,7 +28,7 @@ function makeSmallTestSphere(globe)
     smallSphere.model = craft.model.icosphere(0.2) -- 0.2 is the radius, adjust as needed
     smallSphere.material = craft.material("Materials:Specular")
     smallSphere.material.map = readImage(asset.builtin.Blocks.Cotton_Red) -- You can replace this with any texture
-    smallSphere.position = vec3(0, 5, 0) -- Position at the North Pole of the larger globe
+    smallSphere.position = vec3(0, 0, -globe.scale.z)
     startPoint = smallSphere.position
 end
 
@@ -72,13 +72,13 @@ function createWorld()
     return globe
 end
 
-function initializeMotionVariables()
+function initializeSmallSphereMotionVariables(globe)
     -- Variables to control the movement
     moving = false
-    t = 0
+    arcProgress = 0
     step = 0.01
-    startPoint = vec3(0, 0, 0)
-    endPoint = vec3(5, 0, 0) -- Default end point, can be changed
+    startPoint = vec3(0, 0, globe.scale.z)
+    endPoint = vec3(0, globe.scale.y, 0) -- Default end point, can be changed
 end
 
 function makeFoodSources(globe)

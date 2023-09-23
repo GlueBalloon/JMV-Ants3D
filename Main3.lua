@@ -112,12 +112,12 @@ function draw()
     
     -- If moving, compute the new position along the arc
     if moving then
-        smallSphere.position = travelAlongArc(startPoint, endPoint, 5, t)
-        t = t + step
+        smallSphere.position = travelAlongArc(startPoint, endPoint, 5, arcProgress)
+        arcProgress = arcProgress + step
         
-        if t >= 1 then
+        if arcProgress >= 1 then
 
-            t = 0
+            arcProgress = 0
         end
     end
 end
@@ -145,8 +145,8 @@ function touched(touch)
             startPoint = smallSphere.position
             endPoint = vec3(math.random(-5, 5), math.random(-5, 5), math.random(-5, 5)) -- Random end point for demonstration
             
-            -- Reset t and set moving to true
-            t = 0
+            -- Reset arcProgress and set moving to true
+            arcProgress = 0
             moving = true
         end
     end
