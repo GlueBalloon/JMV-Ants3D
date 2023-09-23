@@ -50,6 +50,9 @@ function createWorld(radius)
     ]]
     -- Set up the 3D world
     scene = craft.scene()
+    scene.sky.material.sky = color(72, 235, 215)       
+    scene.sky.material.horizon = color(34, 30, 66)       
+    scene.sky.material.ground = color(33, 70, 120)
     -- Create the globe (sphere)
     local globe = scene:entity()
     scene.physics.gravity = vec3(0,0,0)
@@ -65,13 +68,12 @@ function createWorld(radius)
     
     globe:add(craft.shape.sphere, 1)
     
-
     --set up a fill light
     fillLight = scene:entity()
     fillLight.rotation = quat.eulerAngles(146, 100, 46)  -- Adjust the angles to point the light where the shadows are
     local fillLightComponent = fillLight:add(craft.light, DIRECTIONAL)
     fillLightComponent.distance = 100
-    fillLightComponent.intensity = 1  -- Adjust the intensity as needed
+    fillLightComponent.intensity = 0.7  -- Adjust the intensity as needed
     fillLightComponent.color = color(55, 150, 196)
     
     return globe
