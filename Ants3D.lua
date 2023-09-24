@@ -94,6 +94,7 @@ function Ants3D:antsUpdate()
     for _,ant in pairs(self.antList) do 
         -- decrease energy
         ant.energy = ant.energy - 1
+        self:walkAround(ant, globe3D)
         travelIfGivenDestination(ant.body, self.globe)
         -- If the ant is not moving, set a new random destination
         -- if time's up, make new decision
@@ -146,6 +147,28 @@ function Ants3D:walkAround(ant)
         self:moveRandomly(ant)
     end
 end
+
+function Ants3D:walkAround(ant, globe)
+    -- Check if the ant has the necessary properties
+    if not (ant.body.d.startPoint and ant.body.d.endPoint and ant.body.d.arcProgress) then
+        return
+    end
+    
+    -- Check if the ant is supposed to be moving
+    if not ant.body.d.moving then
+        -- Generate a new random endPoint and set moving to true
+        local distance = randomPlus(ant.body.scale.y * 3.5, ant.body.scale.y * 5)
+        ant.body.d.endPoint = randomSurfacePointNear(ant.body.position, distance, globe)
+        ant.body.d.moving = true
+        ant.body.d.startPoint = ant.body.position
+        ant.body.d.arcProgress = 0
+        return
+    end
+    
+    -- Existing code for moving the ant along the arc
+    -- ...
+end
+
 
 function Ants3D:kill(ant, duration)
     ant.action = ANT_ACTION_DEAD
