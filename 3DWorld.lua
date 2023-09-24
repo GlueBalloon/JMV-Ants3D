@@ -31,7 +31,7 @@ function makeSmallTestSphere(globe)
     smallSphere.position = vec3(0, 0, -globe.scale.z)
     smallSphere.d.moving = false
     smallSphere.d.arcProgress = 0
-    smallSphere.d.arcStep = 0.01
+    smallSphere.d.arcStep = 0.0125
     smallSphere.d.startPoint = vec3(0, 0, globe.scale.z)
     smallSphere.d.endPoint = vec3(0, globe.scale.y, 0)
 end
@@ -76,6 +76,23 @@ function createWorld(radius)
     fillLightComponent.color = color(55, 150, 196)
     
     return globe
+end
+
+function randomSurfacePointNear(locus, distance, globe)
+    -- Generate a random direction vector
+    local randomDirection = vec3(math.random() - 0.5, math.random() - 0.5, math.random() - 0.5):normalize()
+    
+    -- Scale the direction vector by the desired distance
+    local offset = randomDirection * distance
+    
+    -- Calculate the new point
+    local newPoint = locus + offset
+    
+    -- Normalize the new point to the globe's surface
+    local radius = globe.scale.x
+    newPoint = newPoint:normalize() * radius
+    
+    return newPoint
 end
 
 function makeFoodSources(globe)

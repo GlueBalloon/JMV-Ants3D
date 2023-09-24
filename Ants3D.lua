@@ -1,6 +1,6 @@
 
 function createAntFamilies(globe)
-    local antCount = 60
+    local antCount = 20
     -- Create the first ant family
     local brown = color(178, 62, 50)
     local startPosition1 = vec3(WIDTH/20, HEIGHT/15, 0) -- Adjust this to a suitable 3D position
@@ -94,26 +94,44 @@ function Ants3D:antsUpdate()
     for _,ant in pairs(self.antList) do 
         -- decrease energy
         ant.energy = ant.energy - 1
+        travelIfGivenDestination(ant.body, self.globe)
+        -- If the ant is not moving, set a new random destination
         -- if time's up, make new decision
-        if ant.decisionT0 < ElapsedTime then self:makeDecision(ant) end
+     --   if ant.decisionT0 < ElapsedTime then
+        --self:makeDecision(ant) 
+    --    end
         -- put pheromon
         --        if ant.lastTouchT0 < ElapsedTime then self:pheroAdd(ant) end
-        self:pheroAdd(ant) 
+    --    self:pheroAdd(ant) 
     end
 end
 
 function Ants3D:makeDecision(ant)
+
+    --[[
     local goal = ant.goal
     local t0
     
-    if     goal == GOAL_FIND_FOOD  then self:walkAround(ant)
-    elseif goal == GOAL_LEAVE_HOME then ant.goal = GOAL_FIND_FOOD
-    elseif goal == GOAL_FIND_HOME then self:walkAround(ant)
-    elseif goal == GOAL_DEAD then self:kill(ant)
+    if goal == GOAL_FIND_FOOD  then 
+        self:walkAround(ant)
+    elseif goal == GOAL_LEAVE_HOME then 
+        --ant.goal = GOAL_FIND_FOOD
+        self:walkAround(ant)
+    elseif goal == GOAL_FIND_HOME then 
+        self:walkAround(ant)
+    elseif goal == GOAL_DEAD then 
+        self:kill(ant)
     end 
+    ]]
 
-    if ant.energy <= 5000 then ant.goal = GOAL_FIND_HOME end
-    if ant.energy <= 0 then ant.goal = GOAL_DEAD end
+    if ant.energy <= 5000 then 
+        print(ant.energy, " should find home")
+        ant.goal = GOAL_FIND_HOME 
+    end
+    if ant.energy <= 0 then 
+        print(ant.energy, " dead")
+        ant.goal = GOAL_DEAD 
+    end
 end
 
 function Ants3D:pheroAdd(ant)
@@ -158,21 +176,44 @@ end
 function Ants3D:moveRandomly(ant)
     local scale = self.globe.scale
     local speed = scale.x * ant.speedRatioToGlobe
-    ant.body.position = travelAlongArc(ant.body.position, vec3(randomPlus(-scale.x, scale.x), randomPlus(-scale.y, scale.y), randomPlus(-scale.z, scale.z)), scale.x, speed)
-
+    local randX = ant.body.position.x + randomPlus(-speed, speed)
+    local randY = ant.body.position.y + randomPlus(-speed, speed)
+    local randZ = ant.body.position.z + randomPlus(-speed, speed)
+    ant.body.d.endPoint = vec3(randX, randY, randZ)
+    
     -- Orient the ant to the surface
     orientToSurface(ant.body, self.globe)
 end
 
 function Ants3D:moveRandomly(ant)
     local scale = self.globe.scale
-    local speed = scale.x * ant.speedRatioToGlobe
+    local speed = ant.body.d.arcStep
+    
+    -- Set a new destination for the ant
+    local rad = scale.x
+    ant.body.d.endPoint = vec3(randomPlus(-rad, rad), randomPlus(-rad, rad), randomPlus(-rad, rad))
+    
+    -- Set moving to true
+    ant.body.d.moving = true
+    
+    -- Reset arcProgress
+    --ant.body.d.arcProgress = 0
     
     -- Store the last position
     local lastPosition = ant.body.position
     
     -- Calculate the new position
-    ant.body.position = travelAlongArc(ant.body.position, vec3(randomPlus(-scale.x, scale.x), randomPlus(-scale.y, scale.y), randomPlus(-scale.z, scale.z)), scale.x, speed)
+    --ant.body.position = travelAlongArc(ant.body.position, vec3(randomPlus(-scale.x, scale.x), randomPlus(-scale.y, scale.y), randomPlus(-scale.z, scale.z)), scale.x, speed)
+    ant.body.position = travelAlongArc(ant.body.position, ant.body.d.endPoint, scale.x, speed)
+    
+    if timesRun ~= 0 then
+        print("---___---___---")
+        print("oldStylePosition: ", ant.body.position)
+        print("New endPoint set: ", ant.body.d.endPoint)
+        print("Moving set to: ", ant.body.d.moving)
+        print("arcProgress reset to: ", ant.body.d.arcProgress)
+        if not timesRun then timesRun = 0 else timesRun = timesRun + 1 end
+    end
     
     -- Calculate the direction vector
     local direction = (ant.body.position - lastPosition):normalize()

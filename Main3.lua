@@ -52,10 +52,23 @@ function touched(touch)
             smallSphere.d.startPoint = smallSphere.position
             local rad = globe3D.scale.x
             smallSphere.d.endPoint = vec3(randomPlus(-rad, rad), randomPlus(-rad, rad), randomPlus(-rad, rad)) -- Random end point for demonstration
-            
-            -- Reset arcProgress and set moving to true
-            smallSphered.arcProgress = 0
+            print(smallSphere.d.endPoint)
+            -- set moving to true
             smallSphere.d.moving = true
+        end
+        
+        -- Do the same for all ants
+        for _, ants in ipairs(ants3DTables) do
+            for _, ant in pairs(ants.antList) do
+                ant.body.d.startPoint = ant.body.position
+                --local rad = 0.00001
+                --ant.body.d.endPoint = vec3(randomPlus(-rad, rad), randomPlus(-rad, rad), randomPlus(-rad, rad))
+                local distance = randomPlus(ant.body.scale.y * 4, ant.body.scale.y * 8)
+                ant.body.d.endPoint = randomSurfacePointNear(ant.body.position, ant.body.scale.y * 5, globe3D)
+                -- set moving to true
+                ant.body.d.arcProgress = 0
+                ant.body.d.moving = true
+            end
         end
     end
     touches.touched(touch)
@@ -111,9 +124,35 @@ function travelIfGivenDestination(entity, globe)
         entity.d.moving = false  -- Stop moving when reaching the destination
         -- Optionally, set a new destination here
     end
+    
+    orientToMovement(entity, globe, entity.d.startPoint, entity.d.endPoint)
 end
 
-function travelAlongArc(startPoint, endPoint, radius, t)
+function orientToMovement(antEntity, globe, startPoint, endPoint)
+    local globePosition = globe.position
+    local antPosition = antEntity.position
+    
+    -- Calculate the orientation based on the direction vector
+    local upVector = (antPosition - globePosition):normalize()
+    local forwardDirection = (endPoint - startPoint):normalize()  -- Direction of movement
+    
+    -- Calculate the right vector based on the cross product of forward and up vectors
+    local rightVector = forwardDirection:cross(upVector):normalize()
+    
+    -- Recalculate the forward vector to make it orthogonal to the up and right vectors
+    forwardDirection = upVector:cross(rightVector):normalize()
+    
+    -- Create a quaternion from the up and forward vectors
+    local newRotation = quat.lookRotation(forwardDirection, upVector)
+    
+    -- Apply the initial rotation of 90 degrees around the x-axis
+    local initialRotation = quat.eulerAngles(90, 0, 0)
+    newRotation = newRotation * initialRotation
+    
+    antEntity.rotation = newRotation
+end
+
+function travelAlongArc(startPoint, endPoint, radius, progress)
     -- Normalize the points to the sphere's surface
     startPoint = startPoint:normalize() * radius
     endPoint = endPoint:normalize() * radius
@@ -122,8 +161,8 @@ function travelAlongArc(startPoint, endPoint, radius, t)
     local cosTheta = startPoint:dot(endPoint) / (startPoint:len() * endPoint:len())
     local theta = math.acos(cosTheta)
     
-    local scaleA = math.sin((1 - t) * theta) / math.sin(theta)
-    local scaleB = math.sin(t * theta) / math.sin(theta)
+    local scaleA = math.sin((1 - progress) * theta) / math.sin(theta)
+    local scaleB = math.sin(progress * theta) / math.sin(theta)
     local position = startPoint * scaleA + endPoint * scaleB
     
     return position

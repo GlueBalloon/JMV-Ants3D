@@ -53,6 +53,11 @@ function Ant3D:init(caller, antColor)
     self.action = ANT_ACTION_RUN
     
     self.body.d.arcProgress = 0
+    self.body.d.destination = nil
+    self.body.d.arcStep = 0.02
+    self.body.d.moving = false
+    self.body.d.startPoint = vec3(0,0,0)
+    self.body.d.endPoint = vec3(0,0,0)
     
     -- ant brain data
     self.typ = ANT
