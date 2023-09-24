@@ -57,9 +57,13 @@ function createWorld(radius)
     scene.physics.gravity = vec3(0,0,0)
     globe.model = craft.model(asset.builtin.Primitives.Sphere)
     globe.material = craft.material(asset.builtin.Materials.Standard)
-    globe.material.map = readImage(asset.builtin.Blocks.Stone_Browniron_Alt) -- You can replace this with any texture
-    globe.material.diffuse = color(0, 255, 117)
-    globe.material.offsetRepeat = vec4(0,0,1.5,2.5)
+    globe.material.map = readImage(asset.builtin.Surfaces.Desert_Cliff_Roughness) -- You can replace this with any texture
+    globe.material.diffuse = color(223, 196, 152)
+    globe.material.opacity = 0.2
+    --globe.material.metalness = 0.0
+    globe.material.roughness = 0.7
+    globe.material.roughnessMap = readImage(asset.builtin.Surfaces.Desert_Cliff_Roughness)
+    globe.material.offsetRepeat = vec4(0,0,2,2)
     globe.scale = vec3(1,1,1) * radius -- Adjust the size of the globe
     globeRB = globe:add(craft.rigidbody, DYNAMIC, 0)
     globeRB.group = GROUP_GLOBE
