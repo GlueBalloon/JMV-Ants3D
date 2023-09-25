@@ -1,6 +1,6 @@
 
 function createAntFamilies(globe)
-    local antCount = 20
+    local antCount = 8
     -- Create the first ant family
     local brown = color(193, 45, 30)
     local startPosition1 = vec3(WIDTH/20, HEIGHT/15, 0) -- Adjust this to a suitable 3D position
