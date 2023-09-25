@@ -273,6 +273,7 @@ function Ants:toFood(ant,duration)
     local waitingTime = duration or 1
     ant.decisionT0 = ElapsedTime + waitingTime*(0.5+rnd())
 end
+
 function Ants:pause(ant,duration)
     ant.action = ANT_ACTION_STOP 
     self:setActionTexture(ant)

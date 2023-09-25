@@ -6,8 +6,6 @@
 	<string>Unknown</string>
 	<key>Buffer Order</key>
 	<array>
-		<string>Main</string>
-		<string>Ants</string>
 		<string>World</string>
 		<string>Buttons</string>
 		<string>Main2</string>
@@ -18,11 +16,13 @@
 		<string>SphereCollisionDemo</string>
 		<string>BoundsDemo</string>
 		<string>SpherePlacementDemo</string>
+		<string>Ants</string>
 		<string>Utilities</string>
 		<string>OneLittle_Ant3D</string>
 		<string>Ants3D</string>
 		<string>3DWorld</string>
 		<string>Main3</string>
+		<string>Main</string>
 	</array>
 	<key>Created</key>
 	<string>2013-04-03 03:22:18 +0000</string>

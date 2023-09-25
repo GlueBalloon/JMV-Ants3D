@@ -29,7 +29,7 @@ local ANT_ACTION_DEAD = 1
 local ANT_ACTION_STOP = 2
 local ANT_ACTION_RUN = 3
 --    main objective of the ant
-local GOAL_FIND_FOOD = 1
+local GOAL_3D_FIND_FOOD = 1
 local GOAL_FIND_HOME = 2
 local GOAL_ATTACK = 3
 local GOAL_LEAVE_HOME = 4
@@ -42,7 +42,7 @@ function Ant3D:init(caller, antColor)
     self.color = antColor
 
     self.changeDirPeriod = 6.0 --0.5
-    self.speedRatioToGlobe = 0.00065 --0.00015
+    self.speedRatioToGlobe = 0.025 --0.00015
 
     self.body = self:createBodyEntity(self.color)
     self.body.d = {} --catch-all data table

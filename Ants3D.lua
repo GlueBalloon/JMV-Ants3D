@@ -47,7 +47,7 @@ local ANT_ACTION_DEAD = 1
 local ANT_ACTION_STOP = 2
 local ANT_ACTION_RUN = 3
 --    main objective of the ant
-local GOAL_FIND_FOOD = 1
+local GOAL_3D_FIND_FOOD = 1
 local GOAL_FIND_HOME = 2
 local GOAL_ATTACK = 3
 local GOAL_LEAVE_HOME = 4
@@ -65,10 +65,8 @@ function Ants3D:init(n,c,size,startPos,family, globe)
     self.globe = globe
     self.antList = {}
     
-    self:antEntitiesInit(n, c)
-    
-
     self:homeBaseInit()
+    self:antEntitiesInit(n, c)
     
     -- the ant house data
     self.foodStock = 100
@@ -94,61 +92,83 @@ function Ants3D:antsUpdate()
     for _,ant in pairs(self.antList) do 
         -- decrease energy
         ant.energy = ant.energy - 1
-        self:walkAround(ant, globe3D)
-        travelIfGivenDestination(ant.body, self.globe)
-        -- If the ant is not moving, set a new random destination
+        
         -- if time's up, make new decision
-     --   if ant.decisionT0 < ElapsedTime then
-        --self:makeDecision(ant) 
-    --    end
-        -- put pheromon
-        --        if ant.lastTouchT0 < ElapsedTime then self:pheroAdd(ant) end
-    --    self:pheroAdd(ant) 
+        if ant.decisionT0 < ElapsedTime then
+            self:makeDecision(ant)
+        end
+        
+        -- increment position if endpoint set
+        travelIfGivenDestination(ant.body, self.globe, ant.speedRatioToGlobe)
     end
 end
+
 
 function Ants3D:makeDecision(ant)
-
-    --[[
-    local goal = ant.goal
-    local t0
     
-    if goal == GOAL_FIND_FOOD  then 
-        self:walkAround(ant)
-    elseif goal == GOAL_LEAVE_HOME then 
-        --ant.goal = GOAL_FIND_FOOD
-        self:walkAround(ant)
-    elseif goal == GOAL_FIND_HOME then 
-        self:walkAround(ant)
-    elseif goal == GOAL_DEAD then 
-        self:kill(ant)
-    end 
-    ]]
-
-    if ant.energy <= 5000 then 
-        print(ant.energy, " should find home")
-        ant.goal = GOAL_FIND_HOME 
-    end
     if ant.energy <= 0 then 
-        print(ant.energy, " dead")
-        ant.goal = GOAL_DEAD 
-    end
+        --print(ant.energy, " dead")
+        ant.goal = GOAL_3D_DEAD 
+    elseif ant.energy <= 5000 then 
+        --print(ant.energy, " should find home")
+        ant.goal = GOAL_3D_FIND_HOME 
+    else 
+        --print(ant.energy, " should find food")
+        ant.goal = GOAL_3D_FIND_FOOD
+    end 
+    
+    if ant.goal == GOAL_3D_FIND_FOOD  then 
+        self:walkAround(ant, self.globe)
+    elseif ant.goal == GOAL_3D_FIND_HOME then 
+        self:walkAround(ant, self.globe)
+    elseif ant.goal == GOAL_3D_DEAD then 
+        --self:kill(ant)
+    end 
 end
 
-function Ants3D:pheroAdd(ant)
-    
-end
+
+
 
 function Ants3D:walkAround(ant)
-    local n = 5
-    if rnd(n) == 1 then 
-        self:shortPause(ant) 
+    if math.random(5) == 1 then 
+        self:pause(ant, 0.2) 
     else 
         self:moveRandomly(ant)
     end
 end
 
-function Ants3D:walkAround(ant, globe)
+function Ants3D:toFood(ant,duration)
+    ant.action = ANT_ACTION_RUN
+    self:setActionTexture(ant)
+    local speed,angle
+    local body = ant.body
+    speed = ant.speed *(0.8+rnd()*0.4)
+    angle = self:toFoodAngle(ant) 
+    --    if angle then 
+    if angle then angle = angle + rad(rnd()*60 - 40)
+    else
+        angle = self:toHomeAngle(ant) 
+        if angle then angle = angle + rad(rnd()*60 - 40 +180)
+        else angle = body.angle + rad(rnd()*180 - 100) end
+    end
+    
+    body.angle = angle
+    ant.linearVelocity = vec2(cos(angle),sin(angle)) * speed
+    body.linearVelocity = ant.linearVelocity
+    local waitingTime = duration or 1
+    ant.decisionT0 = ElapsedTime + waitingTime*(0.5+rnd())
+end
+
+function Ants3D:pause(ant, duration)
+    -- Stop the ant's movement
+    ant.body.d.moving = false
+    ant.body.d.endPoint = ant.body.position
+    -- Set the time for the next decision
+    local waitingTime = duration or 0.5
+    ant.decisionT0 = ElapsedTime + waitingTime * (1 + math.random())
+end
+
+function Ants3D:moveRandomly(ant)
     -- Check if the ant has the necessary properties
     if not (ant.body.d.startPoint and ant.body.d.endPoint and ant.body.d.arcProgress) then
         return
@@ -157,16 +177,13 @@ function Ants3D:walkAround(ant, globe)
     -- Check if the ant is supposed to be moving
     if not ant.body.d.moving then
         -- Generate a new random endPoint and set moving to true
-        local distance = randomPlus(ant.body.scale.y * 3.5, ant.body.scale.y * 5)
-        ant.body.d.endPoint = randomSurfacePointNear(ant.body.position, distance, globe)
+        local distance = randomPlus(ant.body.scale.y * 10, ant.body.scale.y * 20)
+        ant.body.d.endPoint = randomSurfacePointNear(ant.body.position, distance, self.globe)
         ant.body.d.moving = true
         ant.body.d.startPoint = ant.body.position
         ant.body.d.arcProgress = 0
         return
     end
-    
-    -- Existing code for moving the ant along the arc
-    -- ...
 end
 
 
@@ -183,82 +200,16 @@ function Ants3D:kill(ant, duration)
 end
 
 
-function Ants3D:pause(ant, duration)
-    -- Stop the ant's movement
-    ant.body.velocity = vec3(0, 0, 0)
+
+
+function Ants3D:pheroAdd(ant)
     
-    -- Set the time for the next decision
-    local waitingTime = duration or 0.5
-    ant.decisionT0 = ElapsedTime + waitingTime * (1 + rnd())
 end
-
-function Ants3D:shortPause(ant)
-    self:pause(ant, 0.2)
-end
-
-function Ants3D:moveRandomly(ant)
-    local scale = self.globe.scale
-    local speed = scale.x * ant.speedRatioToGlobe
-    local randX = ant.body.position.x + randomPlus(-speed, speed)
-    local randY = ant.body.position.y + randomPlus(-speed, speed)
-    local randZ = ant.body.position.z + randomPlus(-speed, speed)
-    ant.body.d.endPoint = vec3(randX, randY, randZ)
-    
-    -- Orient the ant to the surface
-    orientToSurface(ant.body, self.globe)
-end
-
-function Ants3D:moveRandomly(ant)
-    local scale = self.globe.scale
-    local speed = ant.body.d.arcStep
-    
-    -- Set a new destination for the ant
-    local rad = scale.x
-    ant.body.d.endPoint = vec3(randomPlus(-rad, rad), randomPlus(-rad, rad), randomPlus(-rad, rad))
-    
-    -- Set moving to true
-    ant.body.d.moving = true
-    
-    -- Reset arcProgress
-    --ant.body.d.arcProgress = 0
-    
-    -- Store the last position
-    local lastPosition = ant.body.position
-    
-    -- Calculate the new position
-    --ant.body.position = travelAlongArc(ant.body.position, vec3(randomPlus(-scale.x, scale.x), randomPlus(-scale.y, scale.y), randomPlus(-scale.z, scale.z)), scale.x, speed)
-    ant.body.position = travelAlongArc(ant.body.position, ant.body.d.endPoint, scale.x, speed)
-    
-    if timesRun ~= 0 then
-        print("---___---___---")
-        print("oldStylePosition: ", ant.body.position)
-        print("New endPoint set: ", ant.body.d.endPoint)
-        print("Moving set to: ", ant.body.d.moving)
-        print("arcProgress reset to: ", ant.body.d.arcProgress)
-        if not timesRun then timesRun = 0 else timesRun = timesRun + 1 end
-    end
-    
-    -- Calculate the direction vector
-    local direction = (ant.body.position - lastPosition):normalize()
-    
-    -- Calculate the rotation quaternion based on the direction
-    local targetRotation = quat.lookRotation(direction, vec3(0, 1, 0))
-    
-    -- Combine this with the initial 90-degree rotation
-    local finalRotation = quat.eulerAngles(90, 0, 0) * targetRotation
-    
-    -- Set the ant's rotation
-    ant.body.rotation = finalRotation
-    
-    -- Orient the ant to the surface
-    orientToSurface(ant.body, self.globe)
-end
-
-
-
 
 function Ants3D:antEntitiesInit(numAnts, antColor)
     for i = 1, numAnts do
+        local newAnt = Ant3D(self, antColor)
+        newAnt.body.position = self.base.position
         table.insert(self.antList, Ant3D(self, antColor))
     end
 end

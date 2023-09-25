@@ -5,7 +5,6 @@ function setup()
     globe3D = createEnvironment(6)
     makeSmallTestSphere(globe3D)
     ants3DTables = createAntFamilies(globe3D)
-    
     for _, ant in ipairs(ants3DTables[1].antList) do
         local body = ant.body
         globeRadius = globe3D.scale.x
@@ -17,7 +16,8 @@ function setup()
         local y = globeRadius * math.sin(phi) * math.sin(theta)
         local z = globeRadius * math.cos(phi)
         
-        body.position = vec3(x, y, z)
+        --body.position = vec3(x, y, z)
+        body.position = ants3DTables[1].base.position
         orientToSurface(body, globe3D)
     end
     for _, ant in ipairs(ants3DTables[2].antList) do
@@ -31,7 +31,8 @@ function setup()
         local y = globeRadius * math.sin(phi) * math.sin(theta)
         local z = globeRadius * math.cos(phi)
         
-        body.position = vec3(x, y, z)
+        --body.position = vec3(x, y, z)
+        body.position = ants3DTables[2].base.position
         orientToSurface(body, globe3D)
     end
 end
@@ -52,11 +53,12 @@ function touched(touch)
             smallSphere.d.startPoint = smallSphere.position
             local rad = globe3D.scale.x
             smallSphere.d.endPoint = vec3(randomPlus(-rad, rad), randomPlus(-rad, rad), randomPlus(-rad, rad)) -- Random end point for demonstration
-            print(smallSphere.d.endPoint)
+            --print(smallSphere.d.endPoint)
             -- set moving to true
             smallSphere.d.moving = true
         end
         
+        --[[
         -- Do the same for all ants
         for _, ants in ipairs(ants3DTables) do
             for _, ant in pairs(ants.antList) do
@@ -70,6 +72,7 @@ function touched(touch)
                 ant.body.d.moving = true
             end
         end
+        ]]
     end
     touches.touched(touch)
 end
@@ -98,11 +101,13 @@ function orientToSurface(antEntity, globe)
     antEntity.rotation = newRotation
 end
 
-function travelIfGivenDestination(entity, globe)
+function travelIfGivenDestination(entity, globe, speed)
     -- Check if the entity has the necessary properties
     if not (entity.d.startPoint and entity.d.endPoint and entity.d.arcProgress) then
         return
     end
+    
+    local speed = speed or 0.5
     
     -- Check if the entity is supposed to be moving
     if not entity.d.moving then
@@ -112,6 +117,12 @@ function travelIfGivenDestination(entity, globe)
     -- Fetch the radius from the globe
     local radius = globe.scale.x
     
+    -- Calculate the actual distance between startPoint and endPoint
+    local actualDistance = (entity.d.endPoint - entity.d.startPoint):len()
+    
+    -- Calculate arcStep based on the actual distance and desired speed
+    entity.d.arcStep = speed / actualDistance  -- Adjust arcStep based on distance
+
     -- Compute the new position along the arc
     entity.position = travelAlongArc(entity.d.startPoint, entity.d.endPoint, radius, entity.d.arcProgress)
     
