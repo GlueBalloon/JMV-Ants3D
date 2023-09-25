@@ -81,13 +81,13 @@ end
 function Ant3D:createBodyEntity(antColor)
     local antEntity = scene:entity() -- Create a new entity for the ant
     -- Add a capsule model to the entity, rotated on its side
-    antEntity.model = craft.model(asset.builtin.Primitives.Capsule) -- Adjust the dimensions as needed
-    antEntity.material = craft.material("Materials:Standard") -- Use a standard material for now
+    antEntity.model = craft.model(asset.documents.ANT) -- Adjust the dimensions as needed
+    antEntity.material = craft.material(asset.builtin.Materials.Standard) -- Use a standard material for now
     antEntity.material.diffuse = antColor -- Set the ant color for visibility
-    antEntity.scale = vec3(0.08, 0.11, 0.08)
+    antEntity.scale = vec3(0.03, 0.04, 0.03)
     
     -- Rotate the capsule on its side
-    antEntity.rotation = quat.eulerAngles(90, 0, 0) -- Rotate 90 degrees around the x-axis
+    antEntity.rotation = quat.eulerAngles(0, 0, 0) -- Rotate 90 degrees around the x-axis
     antRB = antEntity:add(craft.rigidbody, DYNAMIC, 0)
     antRB.group = GROUP_ANT
     antRB.mask = MASK_ANT

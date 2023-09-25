@@ -1,6 +1,8 @@
 -- Import CodeaCraft modules
 currentAngle = 0
 
+--ant obj model from https://www.turbosquid.com/Search/Artists/stickboybob
+
 function setup()
     globe3D = createEnvironment(6)
     makeSmallTestSphere(globe3D)
@@ -95,10 +97,12 @@ function orientToSurface(antEntity, globe)
     local newRotation = quat.lookRotation(forwardDirection, upVector)
     
     -- Apply the initial rotation of 90 degrees around the x-axis
+--[[
     local initialRotation = quat.eulerAngles(90, 0, 0)
     newRotation = newRotation * initialRotation
     
     antEntity.rotation = newRotation
+]]
 end
 
 function travelIfGivenDestination(entity, globe, speed)
@@ -156,11 +160,14 @@ function orientToMovement(antEntity, globe, startPoint, endPoint)
     -- Create a quaternion from the up and forward vectors
     local newRotation = quat.lookRotation(forwardDirection, upVector)
     
+
     -- Apply the initial rotation of 90 degrees around the x-axis
-    local initialRotation = quat.eulerAngles(90, 0, 0)
+    local initialRotation = 
+        quat.eulerAngles(180, 0, 0)
     newRotation = newRotation * initialRotation
     
     antEntity.rotation = newRotation
+
 end
 
 function travelAlongArc(startPoint, endPoint, radius, progress)
