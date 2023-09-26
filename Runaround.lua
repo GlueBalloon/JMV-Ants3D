@@ -212,17 +212,7 @@ end
 
 function touched(touch)
     if touch.state == BEGAN then
-        --[[
-        -- Calculate the current angle based on the ball's position
-        currentAngle = math.deg(math.atan(smallSphere.position.z, smallSphere.position.x))
-        
-        -- Generate a random angle between 0 and 360
-        local randomAngle = math.random(0, 360)
-        
-        -- Adjust the current angle by the random angle
-        currentAngle = currentAngle + randomAngle
-        ]]
-        
+
         if loop ~= 0 then
             loop = 0
         else

@@ -1,6 +1,6 @@
 
 function createAntFamilies(globe)
-    local antCount = 8
+    local antCount = 28
     -- Create the first ant family
     local brown = color(193, 45, 30)
     local startPosition1 = vec3(WIDTH/20, HEIGHT/15, 0) -- Adjust this to a suitable 3D position
@@ -133,30 +133,56 @@ function Ants3D:walkAround(ant)
     if math.random(5) == 1 then 
         self:pause(ant, 0.2) 
     else 
-        self:moveRandomly(ant)
+        if ant.goal == GOAL_3D_FIND_HOME then self:toFood(ant) end --for now
+        if ant.goal == GOAL_3D_FIND_FOOD then self:toFood(ant) end
     end
 end
 
-function Ants3D:toFood(ant,duration)
-    ant.action = ANT_ACTION_RUN
-    self:setActionTexture(ant)
-    local speed,angle
-    local body = ant.body
-    speed = ant.speed *(0.8+rnd()*0.4)
-    angle = self:toFoodAngle(ant) 
-    --    if angle then 
-    if angle then angle = angle + rad(rnd()*60 - 40)
-    else
-        angle = self:toHomeAngle(ant) 
-        if angle then angle = angle + rad(rnd()*60 - 40 +180)
-        else angle = body.angle + rad(rnd()*180 - 100) end
+function Ants3D:toFood(ant, globe)
+    -- If the ant is not moving, set a new destination
+    if not ant.body.d.moving then
+        -- Get the ant's current forward direction
+        local forwardDirection = rotateVectorByQuat(-vec3(1, 0, 0), ant.body.rotation)
+        
+        -- Introduce a smoother variance in direction
+        local randomDirection = vec3(math.random()-0.5, math.random()-0.5, math.random()-0.5):normalize()
+        local blendedDirection = (forwardDirection + randomDirection * 0.5):normalize()
+        
+        -- Calculate the up vector (direction from ant to globe center)
+        local upVector = (ant.body.position - self.globe.position):normalize()
+        
+        -- Rotate the blendedDirection around the up vector by a random angle between -100 and 80 degrees
+        local randomAngle = math.rad(math.random(-100, 80))
+        local rotationQuat = quat.angleAxis(randomAngle, upVector)
+        blendedDirection = rotateVectorByQuat(blendedDirection, rotationQuat)
+        
+        -- Calculate the new endPoint based on the blended direction
+        local distance = randomPlus(ant.body.scale.y * 4, ant.body.scale.y * 6) * 10
+        local offset = blendedDirection * distance
+        ant.body.d.endPoint = ant.body.position + offset
+        
+        -- Set other necessary properties for movement
+        ant.body.d.moving = true
+        ant.body.d.startPoint = ant.body.position
+        ant.body.d.arcProgress = 0
     end
-    
-    body.angle = angle
-    ant.linearVelocity = vec2(cos(angle),sin(angle)) * speed
-    body.linearVelocity = ant.linearVelocity
-    local waitingTime = duration or 1
-    ant.decisionT0 = ElapsedTime + waitingTime*(0.5+rnd())
+end
+
+
+function Ants3D:toFoodAngle(ant)
+    return nil  -- Placeholder
+end
+
+function Ants3D:toHomeAngle(ant)
+    return nil  -- Placeholder
+end
+
+-- Helper function to rotate a vector by a quaternion
+function rotateVectorByQuat(vec, quat)
+    local qvec = vec3(quat.x, quat.y, quat.z)
+    local uv = qvec:cross(vec)
+    local uuv = qvec:cross(uv)
+    return vec + ((uv * 2.0 * quat.w) + (uuv * 2.0))
 end
 
 function Ants3D:pause(ant, duration)
@@ -186,7 +212,6 @@ function Ants3D:moveRandomly(ant)
     end
 end
 
-
 function Ants3D:kill(ant, duration)
     ant.action = ANT_ACTION_DEAD
     
@@ -199,18 +224,11 @@ function Ants3D:kill(ant, duration)
     ant.decisionT0 = ElapsedTime + waitingTime * (1 + rnd())
 end
 
-
-
-
-function Ants3D:pheroAdd(ant)
-    
-end
-
 function Ants3D:antEntitiesInit(numAnts, antColor)
     for i = 1, numAnts do
         local newAnt = Ant3D(self, antColor)
         newAnt.body.position = self.base.position
-        table.insert(self.antList, Ant3D(self, antColor))
+        table.insert(self.antList, newAnt)
     end
 end
 

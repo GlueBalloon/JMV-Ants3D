@@ -30,7 +30,7 @@ local ANT_ACTION_STOP = 2
 local ANT_ACTION_RUN = 3
 --    main objective of the ant
 local GOAL_3D_FIND_FOOD = 1
-local GOAL_FIND_HOME = 2
+local GOAL_3D_FIND_HOME = 2
 local GOAL_ATTACK = 3
 local GOAL_LEAVE_HOME = 4
 local GOAL_ENTER_HOME = 5
@@ -42,7 +42,7 @@ function Ant3D:init(caller, antColor)
     self.color = antColor
 
     self.changeDirPeriod = 6.0 --0.5
-    self.speedRatioToGlobe = 0.025 --0.00015
+    self.speedRatioToGlobe = 0.1 --0.00015
 
     self.body = self:createBodyEntity(self.color)
     self.body.d = {} --catch-all data table
@@ -81,7 +81,7 @@ end
 function Ant3D:createBodyEntity(antColor)
     local antEntity = scene:entity() -- Create a new entity for the ant
     -- Add a capsule model to the entity, rotated on its side
-    antEntity.model = craft.model(asset.documents.ANT) -- Adjust the dimensions as needed
+    antEntity.model = craft.model(asset.ANT)-- Adjust the dimensions as needed
     antEntity.material = craft.material(asset.builtin.Materials.Standard) -- Use a standard material for now
     antEntity.material.diffuse = antColor -- Set the ant color for visibility
     antEntity.scale = vec3(0.03, 0.04, 0.03)

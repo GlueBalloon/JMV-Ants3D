@@ -1,9 +1,15 @@
--- Import CodeaCraft modules
-currentAngle = 0
 
 --ant obj model from https://www.turbosquid.com/Search/Artists/stickboybob
 
 function setup()    
+    
+    -- copy images from Documents/Dropbox folder to local folder                        
+    --[[
+    img=readText(asset.documents.ANT)
+    saveText(asset.."ANT.obj",img)
+    stop()
+    ]]
+
     globe3D = createEnvironment(6)
     makeSmallTestSphere(globe3D)
     ants3DTables = createAntFamilies(globe3D)
