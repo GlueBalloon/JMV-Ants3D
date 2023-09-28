@@ -6,22 +6,22 @@
 	<string>Unknown</string>
 	<key>Buffer Order</key>
 	<array>
-		<string>World</string>
-		<string>Buttons</string>
+		<string>Main</string>
 		<string>Main2</string>
+		<string>BoundsDemo</string>
 		<string>Runaround</string>
 		<string>FunctionList</string>
-		<string>AntAndButtonSingular</string>
-		<string>SmallBallsDemo</string>
-		<string>SphereCollisionDemo</string>
-		<string>BoundsDemo</string>
-		<string>SpherePlacementDemo</string>
 		<string>Ants</string>
+		<string>SphereCollisionDemo</string>
+		<string>World</string>
+		<string>AntAndButtonSingular</string>
 		<string>Utilities</string>
 		<string>OneLittle_Ant3D</string>
+		<string>SmallBallsDemo</string>
+		<string>SpherePlacementDemo</string>
+		<string>Buttons</string>
 		<string>Ants3D</string>
 		<string>3DWorld</string>
-		<string>Main</string>
 		<string>Main3</string>
 	</array>
 	<key>Created</key>
