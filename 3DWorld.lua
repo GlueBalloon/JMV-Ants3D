@@ -34,8 +34,9 @@ function createEnvironment(globeRadius)
     newModel.uvs = generateUVs(newPos)
     newModel.normals = generateNormals(newPos)
     icosahedron.model = newModel
+   -- icosahedron.material = craft.material(asset.builtin.Materials.Standard)
+   -- icosahedron.material.map = readImage(asset.builtin.Surfaces.Basic_Bricks_Color)
     
-    --
     cubesAtVertices(icosahedron, color(236, 67, 202))
     
     return globe3D
@@ -99,21 +100,31 @@ function generateUVs(positions)
     return uvs
 end
 
+--[[
 function generateUVs(positions)
     local uvs = {}
     for _, pos in ipairs(positions) do
         local normalizedPos = pos:normalize()
+        local absPos = vec3(math.abs(normalizedPos.x), math.abs(normalizedPos.y), math.abs(normalizedPos.z))
         
-        -- Compute the cylindrical projection
-        local u = 0.5 + (math.atan(normalizedPos.z, normalizedPos.x) / (2 * math.pi))
-        local v = 0.5 - (math.asin(normalizedPos.y) / math.pi)
+        local u, v
+        
+        if absPos.x >= absPos.y and absPos.x >= absPos.z then
+            u = normalizedPos.y / normalizedPos.x * 0.5 + 0.5
+            v = normalizedPos.z / normalizedPos.x * 0.5 + 0.5
+        elseif absPos.y >= absPos.x and absPos.y >= absPos.z then
+            u = normalizedPos.x / normalizedPos.y * 0.5 + 0.5
+            v = normalizedPos.z / normalizedPos.y * 0.5 + 0.5
+        else
+            u = normalizedPos.x / normalizedPos.z * 0.5 + 0.5
+            v = normalizedPos.y / normalizedPos.z * 0.5 + 0.5
+        end
         
         table.insert(uvs, vec2(u, v))
     end
     return uvs
 end
-
-
+]]
 
 function generateNormals(positions)
     local normals = {}
@@ -209,7 +220,7 @@ end
 function createIcosahedron(radius)
     local icosahedron = scene:entity()
     icosahedron.model = craft.model(asset.icosahedron)
-    icosahedron.scale = vec3(1,1,1) * radius * 2 -- Adjust the size of the globe
+    icosahedron.scale = vec3(1,1,1) * radius * 2.2 -- Adjust the size of the globe
     return icosahedron
 end
 
@@ -223,10 +234,10 @@ function createWorld(radius)
     -- Create the globe (sphere)
     local globe = scene:entity()
     scene.physics.gravity = vec3(0,0,0)
-    --globe.model = craft.model(asset.builtin.Primitives.Sphere)
-    globe.model = craft.model(asset.icosahedron)
+    globe.model = craft.model(asset.builtin.Primitives.Sphere)
+    --globe.model = craft.model(asset.icosahedron)
     globe.material = craft.material(asset.builtin.Materials.Standard)
-    globe.material.map = readImage(asset.builtin.Surfaces.Basic_Bricks_Color) -- You can replace this with any texture
+    globe.material.map = readImage(asset.builtin.Surfaces.Desert_Cliff_Roughness) -- You can replace this with any texture
     globe.material.diffuse = color(223, 196, 152)
     globe.material.opacity = 0.2
     globe.material.roughness = 0.7
@@ -303,8 +314,9 @@ function makeFoodSources(globe)
         food.d = {} --catch-all data table
         food.model = craft.model(asset.builtin.Primitives.Sphere)
         food.material = craft.material(asset.builtin.Materials.Standard)
-        food.material.map = readImage(asset.builtin.Blocks.Stone_Browniron_Alt) -- You can replace this with any texture
-        food.material.diffuse = color(221, 0, 255)
+        food.material.map = readImage(asset.builtin.Surfaces.Desert_Cliff_Roughness) -- You can replace this with any texture
+        --food.material.diffuse = color(221, 0, 255)
+        food.material.diffuse = color(93, 183, 36)
         local foodRadius = globeRadius * (math.random(70, 150) * 0.001) -- size relative to the globe
         food.scale = vec3(foodRadius, foodHeight, foodRadius) -- squash the sphere
 
@@ -363,11 +375,11 @@ function makeObstacles(globe)
         local obstacleRadius = globeRadius * (math.random(180, 310) * 0.001) -- size relative to the globe
         obstacle.model = craft.model(asset.builtin.Primitives.Capsule)
         obstacle.material = craft.material(asset.builtin.Materials.Standard)
-        obstacle.material.map = readImage(asset.builtin.Blocks.Gravel_Dirt) -- You can replace this with any texture
+        obstacle.material.map = readImage(asset.builtin.Surfaces.Desert_Cliff_Color) -- You can replace this with any texture
         obstacle.material.offsetRepeat = vec4(0,0,1.5,2.5)
         obstacle.scale = vec3(obstacleRadius * 2, obstacleHeight, obstacleRadius * 2)
-        --local uvs = generateNormalBasedUVs(obstacle.model.positions)
-        --obstacle.model.uvs = uvs
+        local uvs = generateNormalBasedUVs(obstacle.model.positions)
+        obstacle.model.uvs = uvs
         
         -- Generate a random unit vector
         local randomDirection = vec3(math.random() - 0.5, math.random() - 0.5, math.random() - 0.5):normalize()
